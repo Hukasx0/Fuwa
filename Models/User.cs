@@ -23,6 +23,7 @@ namespace Fuwa.Models
         public ICollection<CodeSnippet> CodeSnippets { get; set; } = null!;
         public ICollection<Post> Posts { get; set; } = null!;
         public ICollection<PostComment> PostComments { get; set; } = null!;
+        public ICollection<CodeSnippet> LikedSnippets { get; set; } = null!;
     }
 
     public enum Rank

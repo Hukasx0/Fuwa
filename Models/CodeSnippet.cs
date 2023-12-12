@@ -21,6 +21,7 @@ namespace Fuwa.Models
         public string? LastModifiedDate { get; set; }
         [Required]
         public CodeLanguage CodeLanguage { get; set;  }
+        public ICollection<User> LikedBy { get; set; } = null!;
     }
 
     public enum CodeLanguage
