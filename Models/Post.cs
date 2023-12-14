@@ -25,5 +25,8 @@ namespace Fuwa.Models
 
         [Required]
         public DateTime LastModifiedDate { get; set; }
+
+        [InverseProperty("Post")]
+        public ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
     }
 }

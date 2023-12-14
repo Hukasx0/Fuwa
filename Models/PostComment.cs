@@ -17,6 +17,9 @@ namespace Fuwa.Models
         [Required]
         public string? AuthorTag { get; set; }
 
+        [ForeignKey(nameof(AuthorTag))]
+        public User? Author { get; set; }
+
         [Required]
         public string? Text { get; set; }
 

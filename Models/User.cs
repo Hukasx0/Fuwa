@@ -41,7 +41,7 @@ namespace Fuwa.Models
         [InverseProperty("Author")]
         public ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
 
-        [InverseProperty("LikedSnippets")]
+        [InverseProperty("LikedBy")]
         public ICollection<CodeSnippet> LikedSnippets { get; set; } = new List<CodeSnippet>();
     }
 

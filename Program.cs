@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<FuwaDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
+builder.Services.AddDbContext<FuwaDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("FuwaDB")));
 
 var app = builder.Build();
 
