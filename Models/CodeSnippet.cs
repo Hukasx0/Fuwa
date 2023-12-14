@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Fuwa.Models
 {
@@ -7,21 +8,31 @@ namespace Fuwa.Models
         [Key]
         [Required]
         public int Id { get; set; }
-        [Required]
         public string? AuthorTag { get; set; }
+
+        [ForeignKey(nameof(AuthorTag))]
+        public User? Author { get; set; }
+
         [Required]
         public string? Title { get; set; }
+
         [Required]
         public string? Description { get; set; }
+
         [Required]
         public string? Code { get; set; }
+
         [Required]
-        public string? CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+
         [Required]
-        public string? LastModifiedDate { get; set; }
+        public DateTime LastModifiedDate { get; set; }
+
         [Required]
         public CodeLanguage CodeLanguage { get; set;  }
-        public ICollection<User> LikedBy { get; set; } = null!;
+
+        [InverseProperty("LikedSnippets")]
+        public ICollection<User> LikedBy { get; set; } = new List<User>();
     }
 
     public enum CodeLanguage
