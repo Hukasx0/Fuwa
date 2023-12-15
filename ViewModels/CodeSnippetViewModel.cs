@@ -13,8 +13,8 @@ namespace Fuwa.ViewModels
         public string? Title { get; set; }
         public string? Description { get; set; }
         public string? Code { get; set; }
-        public string? CreatedDate { get; set; }
-        public string? LastModifiedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModifiedDate { get; set; }
         public CodeLanguage CodeLanguage { get; set; }
         public ICollection<ShortUserDataViewModel>? LikedBy { get; set; }
     }
