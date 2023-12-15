@@ -46,7 +46,7 @@ namespace Fuwa.Controllers
             };
             await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
-            return CreatedAtRoute("GetUserByTag", new { Tag = registerData.userTag });
+            return CreatedAtRoute("GetUserByTag", new { tag = registerData.userTag });
         }
 
         [HttpPost("login")]

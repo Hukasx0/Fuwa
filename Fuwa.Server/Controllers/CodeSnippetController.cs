@@ -4,6 +4,8 @@ using Fuwa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Fuwa.Controllers
 {
@@ -46,23 +48,37 @@ namespace Fuwa.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddCodeSnippet([FromBody] AddCodeSnippetBody snippetData)
         {
-            if (snippetData == null)
+            if (snippetData == null || 
+                string.IsNullOrWhiteSpace(snippetData.title) ||
+                string.IsNullOrWhiteSpace(snippetData.description) ||
+                string.IsNullOrWhiteSpace(snippetData.code))
             {
                 return BadRequest("Invalid data");
             }
             try
             {
+                var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == userTag);
+
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
                 var newSnippet = new CodeSnippet
                 {
-                    AuthorTag = "test",
+                    AuthorTag = userTag,
+                    Author = user,
                     Title = snippetData.title,
-                    Description = snippetData.title,
+                    Description = snippetData.description,
                     Code = snippetData.code,
                     CreatedDate = DateTime.Now,
                     LastModifiedDate = DateTime.Now,
                     CodeLanguage = CodeLanguage.C,
+                    LikedBy = new List<User>()
                 };
 
                 _context.CodeSnippets.Add(newSnippet);
@@ -70,9 +86,9 @@ namespace Fuwa.Controllers
                 return CreatedAtAction(nameof(GetCodeSnippetById), new { newSnippet.Id });
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, ex);
             }
         }
     }
@@ -80,7 +96,7 @@ namespace Fuwa.Controllers
 
 public class AddCodeSnippetBody
 {
-    public string title { get; set; }
-    public string description { get; set; }
-    public string code { get; set; }
+    public string? title { get; set; }
+    public string? description { get; set; }
+    public string? code { get; set; }
 }

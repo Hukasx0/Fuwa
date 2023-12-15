@@ -34,9 +34,51 @@ namespace Fuwa.Controllers
                 Company = user.Company,
                 Location = user.Location,
                 PersonalWebsite = user.PersonalWebsite,
-                CodeSnippets = (ICollection<CodeSnippetViewModel>)user.CodeSnippets,
-                Posts = (ICollection<PostViewModel>)user.Posts,
-                PostComments = (ICollection<PostCommentViewModel>)user.PostComments
+                CodeSnippets = user.CodeSnippets.Select(cs => new CodeSnippetViewModel
+                {
+                    Id = cs.Id,
+                    PostedBy = new ShortUserDataViewModel
+                    {
+                        Tag = user.Tag,
+                        Username = user.Username
+                    },
+                    Title = cs.Title,
+                    Description = cs.Description,
+                    Code = cs.Code,
+                    CreatedDate = cs.CreatedDate,
+                    LastModifiedDate = cs.LastModifiedDate,
+                    CodeLanguage = cs.CodeLanguage,
+                    LikedBy = cs.LikedBy.Select(lb => new ShortUserDataViewModel
+                    {
+                        Tag = lb.Tag,
+                        Username = lb.Username
+                    }).ToList()
+                }).ToList(),
+                Posts = user.Posts.Select(post => new PostViewModel
+                {
+                    Id = post.Id,
+                    PostedBy = new ShortUserDataViewModel
+                    {
+                        Tag = user.Tag,
+                        Username = user.Username
+                    },
+                    Title = post.Title,
+                    Text = post.Text,
+                    CreatedDate = post.CreatedDate,
+                    LastModifiedDate= post.LastModifiedDate
+                }).ToList(),
+                PostComments = user.PostComments.Select(postComment => new PostCommentViewModel
+                {
+                    Id = postComment.Id,
+                    PostedBy = new ShortUserDataViewModel
+                    {
+                        Tag = user.Tag,
+                        Username = user.Username
+                    },
+                    Text = postComment.Text,
+                    CreatedDate = postComment.CreatedDate,
+                    LastModifiedDate = postComment.LastModifiedDate
+                }).ToList()
             };
             return Ok(displayUser);
         }

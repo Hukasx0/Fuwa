@@ -9,7 +9,7 @@ namespace Fuwa.ViewModels
         public int Id { get; set; }
         public ShortUserDataViewModel? PostedBy { get; set; }
         public string? Text { get; set; }
-        public string? CreatedDate { get; set; }
-        public string? LastModifiedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime LastModifiedDate { get; set; }
     }
 }
