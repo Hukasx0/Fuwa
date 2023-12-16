@@ -3,6 +3,7 @@ using Fuwa.Models;
 using Fuwa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -23,7 +24,7 @@ namespace Fuwa.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCodeSnippetById(int id)
         {
-            var codeSnippet = await _context.CodeSnippets.FindAsync(id);
+            var codeSnippet = await _context.CodeSnippets.Include(cs => cs.Author).FirstOrDefaultAsync(u => u.Id == id);
             if (codeSnippet == null)
             {
                 return NotFound();
@@ -34,7 +35,7 @@ namespace Fuwa.Controllers
                 PostedBy = new ShortUserDataViewModel
                 {
                     Tag = codeSnippet.AuthorTag,
-                    Username = codeSnippet.Author.Username
+                    Username = codeSnippet.Author?.Username,
                 },
                 Title = codeSnippet.Title,
                 Description = codeSnippet.Description,
@@ -42,7 +43,11 @@ namespace Fuwa.Controllers
                 CreatedDate = codeSnippet.CreatedDate,
                 LastModifiedDate = codeSnippet.LastModifiedDate,
                 CodeLanguage = codeSnippet.CodeLanguage,
-                LikedBy = (ICollection<ShortUserDataViewModel>)codeSnippet.LikedBy
+                LikedBy = codeSnippet.LikedBy.Select(lb => new ShortUserDataViewModel
+                {
+                    Tag = lb.Tag,
+                    Username = lb.Username,
+                }).ToList()
             };
             return Ok(displaySnippet);
         }
@@ -75,20 +80,21 @@ namespace Fuwa.Controllers
                     Title = snippetData.title,
                     Description = snippetData.description,
                     Code = snippetData.code,
-                    CreatedDate = DateTime.Now,
-                    LastModifiedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
+                   // LastModifiedDate = DateTime.Now,
                     CodeLanguage = CodeLanguage.C,
                     LikedBy = new List<User>()
                 };
 
                 _context.CodeSnippets.Add(newSnippet);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetCodeSnippetById), new { newSnippet.Id });
+                return Ok();
 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                
+                return StatusCode(500, ex.InnerException);
             }
         }
     }

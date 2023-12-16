@@ -1,7 +1,10 @@
 ﻿using Fuwa.Data;
 using Fuwa.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Fuwa.Controllers
 {
@@ -19,7 +22,11 @@ namespace Fuwa.Controllers
         [HttpGet("{tag}")]
         public async Task<IActionResult> GetUserByTag(string tag)
         {
-            var user = await _context.Users.FindAsync(tag);
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .Include(u => u.Posts)
+                .Include(u => u.PostComments)
+                .FirstOrDefaultAsync(u => u.Tag == tag);
             if (user == null)
             {
                 return NotFound();
@@ -82,5 +89,87 @@ namespace Fuwa.Controllers
             };
             return Ok(displayUser);
         }
+
+        [HttpPut("{tag}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserData(string tag, [FromBody] UpdateUserModel newUserData)
+        {
+            var jwtUserTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (jwtUserTag != tag)
+            {
+                return Forbid();
+            }
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == tag);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            if (!string.IsNullOrWhiteSpace(newUserData.username))
+            {
+                user.Username = newUserData.username;
+            }
+            if (!string.IsNullOrWhiteSpace(newUserData.bio))
+            {
+                user.Bio = newUserData.bio;
+            }
+            if (!string.IsNullOrWhiteSpace(newUserData.githubProfile))
+            {
+                user.GithubProfile = newUserData.githubProfile;
+            }
+            if (!string.IsNullOrWhiteSpace(newUserData.company))
+            {
+                user.Company = newUserData.company;
+            }
+            if (!string.IsNullOrWhiteSpace(newUserData.location))
+            {
+                user.Location = newUserData.location;
+            }
+            if (!string.IsNullOrWhiteSpace(newUserData.personalWebsite))
+            {
+                user.PersonalWebsite = newUserData.personalWebsite;
+            }
+            await _context.SaveChangesAsync();
+            return Ok($"User {user.Tag} data updated successfully");
+        }
+
+        [HttpPut("{tag}/password")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserPassword(string tag, [FromBody] ChangePasswordModel passwords)
+        {
+            var jwtUserTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (jwtUserTag != tag)
+            {
+                return Forbid();
+            }
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == tag);
+            if (user == null) 
+            {
+                return NotFound();
+            }
+            if (!BCrypt.Net.BCrypt.EnhancedVerify(passwords.oldPassword, user.Password))
+            {
+                return BadRequest("incorrect old password was entered");
+            }
+            string newPasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(passwords.newPassword, 13);
+            user.Password = newPasswordHash;
+            await _context.SaveChangesAsync();
+            return Ok($"Password for user {user.Tag} changed successfully");
+        }
     }
+}
+
+public class UpdateUserModel
+{
+    public string? username { get; set; }
+    public string? bio { get; set; }
+    public string? githubProfile { get; set; }
+    public string? company { get; set; }
+    public string? location { get; set; }
+    public string? personalWebsite { get; set; }
+}
+
+public class ChangePasswordModel
+{
+    public string? oldPassword { get; set; }
+    public string? newPassword { get; set; }
 }
