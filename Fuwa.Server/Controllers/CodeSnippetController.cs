@@ -56,21 +56,29 @@ namespace Fuwa.Controllers
         [Authorize]
         public async Task<IActionResult> AddCodeSnippet([FromBody] AddCodeSnippetBody snippetData)
         {
-            if (snippetData == null || 
+            if (snippetData == null ||
                 string.IsNullOrWhiteSpace(snippetData.title) ||
                 string.IsNullOrWhiteSpace(snippetData.description) ||
                 string.IsNullOrWhiteSpace(snippetData.code))
             {
                 return BadRequest("Invalid data");
             }
+
             try
             {
                 var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == userTag);
+                var user = await _context.Users
+                    .Include(u => u.CodeSnippets)
+                    .SingleOrDefaultAsync(u => u.Tag == userTag);
 
                 if (user == null)
                 {
                     return NotFound("User not found");
+                }
+
+                if (user.CodeSnippets.Any(cs => cs.Title == snippetData.title))
+                {
+                    return BadRequest($"User {userTag} already has a snippet titled '{snippetData.title}'");
                 }
 
                 var newSnippet = new CodeSnippet
@@ -81,7 +89,7 @@ namespace Fuwa.Controllers
                     Description = snippetData.description,
                     Code = snippetData.code,
                     CreatedDate = DateTime.UtcNow,
-                   // LastModifiedDate = DateTime.Now,
+                    // LastModifiedDate = DateTime.Now,
                     CodeLanguage = CodeLanguage.C,
                     LikedBy = new List<User>()
                 };
@@ -89,11 +97,9 @@ namespace Fuwa.Controllers
                 _context.CodeSnippets.Add(newSnippet);
                 await _context.SaveChangesAsync();
                 return Ok();
-
             }
             catch (Exception ex)
             {
-                
                 return StatusCode(500, ex.InnerException);
             }
         }

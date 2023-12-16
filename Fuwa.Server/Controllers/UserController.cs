@@ -90,6 +90,191 @@ namespace Fuwa.Controllers
             return Ok(displayUser);
         }
 
+        [HttpGet("{usertag}/codeSnippets")]
+        public async Task<IActionResult> GetUserCodeSnippets(string usertag)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .FirstOrDefaultAsync(u => u.Tag  == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            var displaySnippets = user.CodeSnippets.Select(cs => new CodeSnippetViewModel
+            {
+                Id = cs.Id,
+                PostedBy = new ShortUserDataViewModel
+                {
+                    Tag = user.Tag,
+                    Username = user.Username
+                },
+                Title = cs.Title,
+                Description = cs.Description,
+                Code = cs.Code,
+                CreatedDate = cs.CreatedDate,
+                LastModifiedDate = cs.LastModifiedDate,
+                CodeLanguage = cs.CodeLanguage,
+                LikedBy = cs.LikedBy.Select(lb => new ShortUserDataViewModel
+                {
+                    Tag = lb.Tag,
+                    Username = lb.Username
+                }).ToList(),
+            }).ToList();
+            return Ok(displaySnippets);
+        }
+
+        [HttpGet("{usertag}/codeSnippets/{snippetName}")]
+        public async Task<IActionResult> GetUserCodeSnippetBySlug(string usertag, string snippetName)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            var codeSnippet = user.CodeSnippets.FirstOrDefault(cs => cs.Title == snippetName);
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+            var displaySnippet = new CodeSnippetViewModel
+            {
+                Id = codeSnippet.Id,
+                PostedBy = new ShortUserDataViewModel
+                {
+                    Tag = user.Tag,
+                    Username = user.Username
+                },
+                Title = codeSnippet.Title,
+                Description = codeSnippet.Description,
+                Code = codeSnippet.Code,
+                CreatedDate = codeSnippet.CreatedDate,
+                LastModifiedDate = codeSnippet.LastModifiedDate,
+                CodeLanguage = codeSnippet.CodeLanguage,
+                LikedBy = codeSnippet.LikedBy.Select(lb => new ShortUserDataViewModel
+                {
+                    Tag = lb.Tag,
+                    Username = lb.Username
+                }).ToList()
+            };
+            return Ok(displaySnippet);
+        }
+
+        [HttpPut("{usertag}/codeSnippets/{snippetName}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserCodeSnippetBySlug(string usertag, string snippetName, [FromBody] EditCodeSnippetModel editData)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            else if (userTag != user.Tag)
+            {
+                return Unauthorized();
+            }
+            var codeSnippet = user.CodeSnippets.FirstOrDefault(cs => cs.Title == snippetName);
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+            if (!string.IsNullOrWhiteSpace(editData.description))
+            {
+                codeSnippet.Description = editData.description;
+            }
+            if (!string.IsNullOrWhiteSpace(editData.code))
+            {
+                codeSnippet.Code = editData.code;
+            }
+            codeSnippet.LastModifiedDate = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return Ok($"Code snippet {snippetName} for user {usertag} updated successfully.");
+        }
+
+        [HttpDelete("{usertag}/codeSnippets/{snippetName}")]
+        [Authorize]
+        public async Task<IActionResult> RemoveUserCodeSnippetBySlug(string usertag, string snippetName)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            else if (userTag != user.Tag)
+            {
+                return Unauthorized();
+            }
+            var codeSnippet = user.CodeSnippets.FirstOrDefault(cs => cs.Title == snippetName);
+
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+
+            _context.CodeSnippets.Remove(codeSnippet);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Code snippet {snippetName} for user {usertag} deleted successfully.");
+        }
+
+        [HttpGet("{usertag}/posts")]
+        public async Task<IActionResult> GetUserPosts(string usertag)
+        {
+            var user = await _context.Users
+                .Include(u => u.Posts)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            var displayPosts = user.Posts.Select(p => new PostViewModel
+            {
+                Id = p.Id,
+                PostedBy = new ShortUserDataViewModel
+                {
+                    Tag = user.Tag,
+                    Username = user.Username
+                },
+                Title = p.Title,
+                Text = p.Text,
+                CreatedDate = p.CreatedDate,
+                LastModifiedDate = p.LastModifiedDate
+            }).ToList();
+            return Ok(displayPosts);
+        }
+
+        [HttpGet("{usertag}/comments")]
+        public async Task<IActionResult> GetUserComments(string usertag)
+        {
+            var user = await _context.Users
+                .Include(u => u.PostComments)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            var displayComments = user.PostComments.Select(pc => new PostCommentViewModel
+            {
+                Id = pc.Id,
+                PostedBy = new ShortUserDataViewModel
+                {
+                    Tag = user.Tag,
+                    Username = user.Username
+                },
+                Text = pc.Text,
+                CreatedDate = pc.CreatedDate,
+                LastModifiedDate = pc.LastModifiedDate
+            }).ToList();
+            return Ok(displayComments);
+        }
+
         [HttpPut("{tag}")]
         [Authorize]
         public async Task<IActionResult> UpdateUserData(string tag, [FromBody] UpdateUserModel newUserData)
@@ -172,4 +357,10 @@ public class ChangePasswordModel
 {
     public string? oldPassword { get; set; }
     public string? newPassword { get; set; }
+}
+
+public class EditCodeSnippetModel
+{
+    public string? description { get; set; }
+    public string? code { get; set; }
 }

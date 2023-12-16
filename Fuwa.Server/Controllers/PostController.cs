@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Fuwa.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fuwa.Server.Controllers
@@ -7,5 +8,12 @@ namespace Fuwa.Server.Controllers
     [ApiController]
     public class PostController : ControllerBase
     {
+        private readonly FuwaDbContext _context;
+
+        public PostController(FuwaDbContext context)
+        {
+            _context = context;
+        }
+
     }
 }
