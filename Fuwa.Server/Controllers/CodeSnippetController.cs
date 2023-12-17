@@ -98,9 +98,9 @@ namespace Fuwa.Controllers
                 await _context.SaveChangesAsync();
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, ex.InnerException);
+                return StatusCode(500, "Internal server error");
             }
         }
     }
