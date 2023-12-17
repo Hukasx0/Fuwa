@@ -19,8 +19,8 @@ namespace Fuwa.Controllers
             _context = context;
         }
 
-        [HttpGet("{tag}")]
-        public async Task<IActionResult> GetUserByTag(string tag)
+        [HttpGet("{tag}", Name = "GetUserByTag")]
+        public async Task<IActionResult> GetUserByTag([FromRoute] string tag)
         {
             var user = await _context.Users
                 .Include(u => u.CodeSnippets)
