@@ -224,6 +224,42 @@ namespace Fuwa.Controllers
             return Ok($"Code snippet {snippetName} for user {usertag} deleted successfully.");
         }
 
+        [HttpPost("{usertag}/codeSnippets/{snippetName}/like")]
+        [Authorize]
+        public async Task<IActionResult> LikeCodeSnippet(string usertag, string snippetName)
+        {
+            var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _context.Users
+                .Include(u => u.LikedSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == userTag);
+
+            if (user == null)
+            {
+                return NotFound($"User with tag {userTag} not found.");
+            }
+
+            var codeSnippet = await _context.CodeSnippets
+                .FirstOrDefaultAsync(cs => cs.AuthorTag == usertag && cs.Title == snippetName);
+
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+
+            if (!user.LikedSnippets.Contains(codeSnippet))
+            {
+                user.LikedSnippets.Add(codeSnippet);
+                await _context.SaveChangesAsync();
+                return Ok($"Code snippet {snippetName} for user {usertag} liked successfully.");
+            }
+            else
+            {
+                user.LikedSnippets.Remove(codeSnippet);
+                await _context.SaveChangesAsync();
+                return Ok($"Code snippet {snippetName} for user {usertag} has been removed from liked snippets.");
+            }
+        }
+
         [HttpGet("{usertag}/posts")]
         public async Task<IActionResult> GetUserPosts(string usertag)
         {
