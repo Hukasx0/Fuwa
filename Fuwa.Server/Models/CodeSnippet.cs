@@ -13,6 +13,11 @@ namespace Fuwa.Models
         [ForeignKey(nameof(AuthorTag))]
         public User? Author { get; set; }
 
+        public int? MixedFromId {  get; set; }
+
+        [ForeignKey(nameof(MixedFromId))]
+        public CodeSnippet? MixedFrom { get; set; }
+
         [Required]
         public string? Title { get; set; }
 
@@ -30,6 +35,9 @@ namespace Fuwa.Models
 
         [Required]
         public CodeLanguage CodeLanguage { get; set; }
+
+        [InverseProperty("MixedFrom")]
+        public ICollection<CodeSnippet> Mixes { get; set; } = new List<CodeSnippet>();
 
         [InverseProperty("LikedSnippets")]
         public ICollection<User> LikedBy { get; set; } = new List<User>();

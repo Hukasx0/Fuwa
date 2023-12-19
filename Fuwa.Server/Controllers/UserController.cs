@@ -1,4 +1,5 @@
 ﻿using Fuwa.Data;
+using Fuwa.Models;
 using Fuwa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -239,6 +240,7 @@ namespace Fuwa.Controllers
             }
 
             var codeSnippet = await _context.CodeSnippets
+                .Include(cs => cs.LikedBy)
                 .FirstOrDefaultAsync(cs => cs.AuthorTag == usertag && cs.Title == snippetName);
 
             if (codeSnippet == null)
@@ -246,17 +248,88 @@ namespace Fuwa.Controllers
                 return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
             }
 
-            if (!user.LikedSnippets.Contains(codeSnippet))
+            if (user.LikedSnippets.Contains(codeSnippet))
             {
-                user.LikedSnippets.Add(codeSnippet);
+                user.LikedSnippets.Remove(codeSnippet);
+                codeSnippet.LikedBy.Remove(user);
                 await _context.SaveChangesAsync();
-                return Ok($"Code snippet {snippetName} for user {usertag} liked successfully.");
+                return Ok($"Code snippet {snippetName} for user {usertag} has been removed from liked snippets.");
             }
             else
             {
-                user.LikedSnippets.Remove(codeSnippet);
+                user.LikedSnippets.Add(codeSnippet);
+                codeSnippet.LikedBy.Add(user);
                 await _context.SaveChangesAsync();
-                return Ok($"Code snippet {snippetName} for user {usertag} has been removed from liked snippets.");
+                return Ok($"Code snippet {snippetName} for user {usertag} liked successfully.");
+            }
+        }
+
+        [HttpPost("{usertag}/codeSnippets/{snippetName}/mix")]
+        [Authorize]
+        public async Task<IActionResult> MixCodeSnippet(string usertag, string snippetName, [FromBody] MixCodeSnippetModel mixData)
+        {
+            try
+            {
+                var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _context.Users
+                    .Include(u => u.CodeSnippets)
+                    .FirstOrDefaultAsync(u => u.Tag == userTag);
+
+                if (user is null)
+                {
+                    return NotFound($"User with tag {userTag} not found.");
+                }
+
+                var codeSnippet = await _context.CodeSnippets
+                    .FirstOrDefaultAsync(cs => cs.AuthorTag == usertag && cs.Title == snippetName);
+
+                if (codeSnippet is null)
+                {
+                    return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+                }
+
+                string newTitle = "";
+
+                if (mixData.title is null)
+                {
+                    var existingSnippets = user.CodeSnippets
+                    .Where(cs => cs.Title.StartsWith($"{snippetName}-mix-"))
+                    .Select(cs => cs.Title)
+                    .ToList();
+
+                    var maxCounter = existingSnippets
+                        .Select(title => int.TryParse(title.Substring($"{snippetName}-mix-".Length), out int counter) ? counter : 0)
+                        .DefaultIfEmpty(0)
+                        .Max();
+
+                    newTitle = $"{snippetName}-mix-{maxCounter + 1}";
+                }
+                else
+                {
+                    newTitle = mixData.title;
+                }
+
+                var newCodeSnippet = new CodeSnippet
+                {
+                    AuthorTag = userTag,
+                    Author = user,
+                    Title = newTitle,
+                    Description = string.IsNullOrWhiteSpace(mixData.description) ? codeSnippet.Description : mixData.description,
+                    Code = codeSnippet.Code,
+                    CreatedDate = DateTime.UtcNow,
+                    CodeLanguage = codeSnippet.CodeLanguage,
+                    MixedFrom = codeSnippet
+                };
+
+                user.CodeSnippets.Add(newCodeSnippet);
+                codeSnippet.Mixes.Add(newCodeSnippet);
+                await _context.SaveChangesAsync();
+
+                return Ok($"Code snippet {snippetName} forked successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -399,4 +472,10 @@ public class EditCodeSnippetModel
 {
     public string? description { get; set; }
     public string? code { get; set; }
+}
+
+public class MixCodeSnippetModel
+{
+    public string? title { get; set; }
+    public string? description { get; set; }
 }

@@ -1,5 +1,6 @@
 ﻿using Fuwa.Data;
 using Fuwa.Models;
+using Fuwa.Server.ViewModels;
 using Fuwa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +25,12 @@ namespace Fuwa.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCodeSnippetById(int id)
         {
-            var codeSnippet = await _context.CodeSnippets.Include(cs => cs.Author).FirstOrDefaultAsync(u => u.Id == id);
+            var codeSnippet = await _context.CodeSnippets
+                .Include(cs => cs.Author)
+                .Include(cs => cs.LikedBy)
+                .Include(cs => cs.MixedFrom)
+                .Include(cs => cs.Mixes)
+                .FirstOrDefaultAsync(u => u.Id == id);
             if (codeSnippet == null)
             {
                 return NotFound();
@@ -40,9 +46,31 @@ namespace Fuwa.Controllers
                 Title = codeSnippet.Title,
                 Description = codeSnippet.Description,
                 Code = codeSnippet.Code,
+                MixedFrom = codeSnippet.MixedFrom != null
+                    ? new MixViewModel
+                    {
+                        Title = codeSnippet.MixedFrom.Title,
+                        Author = new ShortUserDataViewModel
+                        {
+                            Tag = codeSnippet.MixedFrom.AuthorTag,
+                            Username = codeSnippet.MixedFrom.Author?.Username,
+                        },
+                        CreatedDate = codeSnippet.MixedFrom.CreatedDate
+                    }
+                    : null,
                 CreatedDate = codeSnippet.CreatedDate,
                 LastModifiedDate = codeSnippet.LastModifiedDate,
                 CodeLanguage = codeSnippet.CodeLanguage,
+                Mixes = codeSnippet.Mixes?.Select(m => new MixViewModel
+                {
+                    Title = m.Title,
+                    Author = new ShortUserDataViewModel
+                    {
+                        Tag = m.AuthorTag,
+                        Username = m.Author?.Username,
+                    },
+                    CreatedDate = m.CreatedDate
+                }).ToList(),
                 LikedBy = codeSnippet.LikedBy.Select(lb => new ShortUserDataViewModel
                 {
                     Tag = lb.Tag,
