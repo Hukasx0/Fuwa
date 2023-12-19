@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Fuwa.Server.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Fuwa.Models
@@ -41,6 +42,9 @@ namespace Fuwa.Models
 
         [InverseProperty("LikedSnippets")]
         public ICollection<User> LikedBy { get; set; } = new List<User>();
+
+        [InverseProperty("CodeSnippet")]
+        public ICollection<CodeSnippetComment> Comments { get; set; } = new List<CodeSnippetComment>();
     }
 
     public enum CodeLanguage

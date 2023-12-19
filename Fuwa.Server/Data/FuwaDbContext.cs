@@ -1,4 +1,5 @@
 ﻿using Fuwa.Models;
+using Fuwa.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fuwa.Data
@@ -10,6 +11,7 @@ namespace Fuwa.Data
         public DbSet<CodeSnippet> CodeSnippets { get; set; } = null!;
         public DbSet<Post> Posts { get; set; } = null!;
         public DbSet<PostComment> PostComments { get; set; } = null!;
+        public DbSet<CodeSnippetComment> CodeSnippetComments { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
