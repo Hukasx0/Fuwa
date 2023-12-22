@@ -1,1 +1,29 @@
-<p>register works!</p>
+<form class="register-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>User Tag</mat-label>
+      <input matInput formControlName="userTag" />
+    </mat-form-field>
+  
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+    </mat-form-field>
+  
+    <mat-form-field appearance="fill">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" />
+    </mat-form-field>
+  
+    <mat-form-field appearance="fill">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" formControlName="password" />
+    </mat-form-field>
+
+    <mat-checkbox formControlName="acceptTerms">
+        I accept the terms and conditions
+    </mat-checkbox>
+  
+    <button mat-raised-button color="primary" type="submit" [disabled]="isFormInvalid()">
+        Register
+    </button>
+</form>
