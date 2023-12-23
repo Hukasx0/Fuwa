@@ -13,6 +13,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class RegisterComponent {
   registerForm: FormGroup;
 
+  ngOnInit() {
+    if (localStorage.getItem('auth')) {
+      this.router.navigate(['/dashboard']);
+    }
+   }
+
   constructor(private formbuilder: FormBuilder,
               private authService: AuthenticationService,
               private router: Router,

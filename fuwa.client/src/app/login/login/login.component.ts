@@ -13,6 +13,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class LoginComponent {
  loginForm: FormGroup;
 
+ ngOnInit() {
+  if (localStorage.getItem('auth')) {
+    this.router.navigate(['/dashboard']);
+  }
+ }
+
  constructor(private formbuilder: FormBuilder,
              private authService: AuthenticationService,
              private router: Router,
@@ -44,7 +50,7 @@ onSubmit() {
     },
     error: (error) => {
       console.error('Login error:', error);
-      this.showSnackbarError(error.message || 'Login error occurred');
+      this.showSnackbarError(error.error || 'Login error occurred');
     }
   });
  }
