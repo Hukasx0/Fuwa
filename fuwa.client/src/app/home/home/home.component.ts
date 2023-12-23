@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -7,11 +6,5 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-  ngOnInit() {
-    if (localStorage.getItem('auth')) {
-      this.router.navigate(['/dashboard']);
-    }
-   }
 
-   constructor(private router: Router) {}
 }

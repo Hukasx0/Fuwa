@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomeRoutingModule } from './home/home-routing.module';
-import { DashboardRoutingModule } from './dashboard/dashboard-routing.module';
 import { LoginRoutingModule } from './login/login-routing.module';
 import { RegisterRoutingModule } from './register/register-routing.module';
 import { UserProfileRoutingModule } from './user-profile/user-profile-routing.module';
@@ -11,15 +9,12 @@ import { CodeSnippetRoutingModule } from './code-snippet/code-snippet-routing.mo
 import { PostRoutingModule } from './post/post-routing.module';
 import { NewPostRoutingModule } from './new-post/new-post-routing.module';
 import { NewCodeSnippetRoutingModule } from './new-code-snippet/new-code-snippet-routing.module';
+import { IndexRoutingModule } from './index/index-routing.module';
 
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./home/home.module').then(m => m.HomeModule)
-  },
-  {
-    path: 'dashboard',
-    loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
+    loadChildren: () => import('./index/index.module').then(m => m.IndexModule)
   },
   {
     path: 'settings',
@@ -64,8 +59,7 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes),
 
-    HomeRoutingModule,
-    DashboardRoutingModule,
+    IndexRoutingModule,
     UserSettingsRoutingModule,
     LoginRoutingModule,
     RegisterRoutingModule,

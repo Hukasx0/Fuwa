@@ -15,7 +15,7 @@ export class RegisterComponent {
 
   ngOnInit() {
     if (localStorage.getItem('auth')) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/']);
     }
    }
 

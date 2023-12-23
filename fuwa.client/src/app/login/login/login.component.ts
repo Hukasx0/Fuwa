@@ -15,7 +15,7 @@ export class LoginComponent {
 
  ngOnInit() {
   if (localStorage.getItem('auth')) {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/']);
   }
  }
 
@@ -46,7 +46,7 @@ onSubmit() {
   this.authService.login(loginData).subscribe({
     next: (response) => {
       localStorage.setItem('auth', response.token);
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/']);
     },
     error: (error) => {
       console.error('Login error:', error);
