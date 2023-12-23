@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Register } from 'src/app/models/register';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-register',
@@ -9,7 +13,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class RegisterComponent {
   registerForm: FormGroup;
 
-  constructor(private formbuilder: FormBuilder) {
+  constructor(private formbuilder: FormBuilder,
+              private authService: AuthenticationService,
+              private router: Router,
+              private snackBar: MatSnackBar
+              ) {
     this.registerForm = this.formbuilder.group({
       userTag: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -26,6 +34,29 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    console.log(this.registerForm.value);
+    if (this.isFormInvalid()) {
+      return;
+    }
+    const registerData: Register = {
+      userTag: this.registerForm.get('userTag')?.value as string,
+      email: this.registerForm.get('email')?.value as string,
+      username: this.registerForm.get('username')?.value as string,
+      password: this.registerForm.get('password')?.value as string
+    };
+
+    this.authService.register(registerData).subscribe({
+      next: (response) => {
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        console.error('Register error:', error);
+        this.showSnackbarError(error.error || 'Register error occurred');
+      }
+    })
+  }
+  private showSnackbarError(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000
+     });
   }
 }
