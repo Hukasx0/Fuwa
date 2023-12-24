@@ -5,6 +5,23 @@
         <b style="cursor: pointer;" routerLink="/{{ post.postedBy.tag }}">{{ post.postedBy.username }}</b> 
         at {{ post.createdDate }}
     </p>
+    <div>
+        @for (comment of postComments; track comment.id) {
+            <div style="background-color: azure;">
+                <p>{{ comment.text }}</p>
+                <p>posted by 
+                    <b routerLink="/{{ post.postedBy.tag }}" style="cursor: pointer;">
+                        {{ comment.postedBy.username }}
+                    </b>
+                    at
+                    {{ post.createdDate }}
+                </p>
+            </div>
+        } @empty {
+            <div>no comments</div>
+        }
+        
+    </div>
 } @else {
     <div>Not found</div>
 }

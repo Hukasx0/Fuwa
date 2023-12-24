@@ -1,9 +1,8 @@
 import { PostedBy } from "./postedBy"
 
-export class Post {
+export class PostComment {
     id: number = 0
     postedBy: PostedBy = new PostedBy
-    title: string = ""
     text: string = ""
     createdDate: Date = new Date()
     lastModifiedDate: Date | undefined
