@@ -55,7 +55,7 @@ export class RegisterComponent {
         this.router.navigate(['/login']);
       },
       error: (error) => {
-        console.error('Register error:', error);
+        console.error('Register error: ', error);
         this.showSnackbarError(error.error || 'Register error occurred');
       }
     })

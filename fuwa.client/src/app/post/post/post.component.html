@@ -1,1 +1,10 @@
-<p>post works!</p>
+@if (post) {
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.text }}</p>
+    <p>posted by 
+        <b style="cursor: pointer;" routerLink="/{{ post.postedBy.tag }}">{{ post.postedBy.username }}</b> 
+        at {{ post.createdDate }}
+    </p>
+} @else {
+    <div>Not found</div>
+}

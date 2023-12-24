@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostComponent } from './post/post.component';
-
+import { RouterLink } from '@angular/router';
 
 
 @NgModule({
@@ -9,7 +9,8 @@ import { PostComponent } from './post/post.component';
     PostComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    RouterLink
   ]
 })
 export class PostModule { }

@@ -20,6 +20,31 @@ namespace Fuwa.Server.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPosts([FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
+        {
+            pageSize = Math.Min(pageSize, 10);
+            var posts = await _context.Posts
+                .Include(p => p.Author)
+                .OrderByDescending(p => p.Id)
+                .Skip(pageIndex)
+                .Take(pageSize)
+                .Select(p => new PostViewModel
+                {
+                    Id = p.Id,
+                    PostedBy = new ShortUserDataViewModel
+                    {
+                        Tag = p.AuthorTag,
+                        Username = p.Author.Username
+                    },
+                    Title = p.Title,
+                    Text = p.Text,
+                    CreatedDate = p.CreatedDate,
+                    LastModifiedDate = p.LastModifiedDate
+                }).ToListAsync();
+            return Ok(posts);
+        }
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddPost([FromBody] PostModel postData)
