@@ -1,1 +1,7 @@
-<p>code-snippet works!</p>
+@if (codeSnippet) {
+    <h1>{{ codeSnippet.title }}</h1>
+    <h3>{{ codeSnippet.description }}</h3>
+    <code>{{ codeSnippet.code }}</code>
+} @else {
+    <div>Not found</div>
+}

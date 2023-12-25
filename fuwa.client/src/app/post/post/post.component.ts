@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NewPostComment } from 'src/app/models/newPostComment';
 import { Post } from 'src/app/models/post';
 import { PostComment } from 'src/app/models/postComment';
 import { PostsService } from 'src/app/services/posts.service';
