@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Fuwa.Controllers
+namespace Fuwa.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -9,75 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace Fuwa.Controllers
+namespace Fuwa.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CodeSnippetController : ControllerBase
+    public partial class CodeSnippetController : ControllerBase
     {
         private readonly FuwaDbContext _context;
 
         public CodeSnippetController(FuwaDbContext context)
         {
             _context = context;
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCodeSnippetById(int id)
-        {
-            var codeSnippet = await _context.CodeSnippets
-                .Include(cs => cs.Author)
-                .Include(cs => cs.LikedBy)
-                .Include(cs => cs.MixedFrom)
-                .Include(cs => cs.Mixes)
-                .FirstOrDefaultAsync(u => u.Id == id);
-            if (codeSnippet == null)
-            {
-                return NotFound();
-            }
-            var displaySnippet = new CodeSnippetViewModel
-            {
-                Id = codeSnippet.Id,
-                PostedBy = new ShortUserDataViewModel
-                {
-                    Tag = codeSnippet.AuthorTag,
-                    Username = codeSnippet.Author?.Username,
-                },
-                Title = codeSnippet.Title,
-                Description = codeSnippet.Description,
-                Code = codeSnippet.Code,
-                MixedFrom = codeSnippet.MixedFrom != null
-                    ? new MixViewModel
-                    {
-                        Title = codeSnippet.MixedFrom.Title,
-                        Author = new ShortUserDataViewModel
-                        {
-                            Tag = codeSnippet.MixedFrom.AuthorTag,
-                            Username = codeSnippet.MixedFrom.Author?.Username,
-                        },
-                        CreatedDate = codeSnippet.MixedFrom.CreatedDate
-                    }
-                    : null,
-                CreatedDate = codeSnippet.CreatedDate,
-                LastModifiedDate = codeSnippet.LastModifiedDate,
-                CodeLanguage = codeSnippet.CodeLanguage,
-                Mixes = codeSnippet.Mixes?.Select(m => new MixViewModel
-                {
-                    Title = m.Title,
-                    Author = new ShortUserDataViewModel
-                    {
-                        Tag = m.AuthorTag,
-                        Username = m.Author?.Username,
-                    },
-                    CreatedDate = m.CreatedDate
-                }).ToList(),
-                LikedBy = codeSnippet.LikedBy.Select(lb => new ShortUserDataViewModel
-                {
-                    Tag = lb.Tag,
-                    Username = lb.Username,
-                }).ToList()
-            };
-            return Ok(displaySnippet);
         }
 
         [HttpPost]
@@ -131,6 +73,215 @@ namespace Fuwa.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
+        [HttpGet("{usertag}/{snippetName}")]
+        public async Task<IActionResult> GetUserCodeSnippetBySlug(string usertag, string snippetName)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            var codeSnippet = user.CodeSnippets.FirstOrDefault(cs => cs.Title == snippetName);
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+            var displaySnippet = new CodeSnippetViewModel
+            {
+                Id = codeSnippet.Id,
+                PostedBy = new ShortUserDataViewModel
+                {
+                    Tag = user.Tag,
+                    Username = user.Username
+                },
+                Title = codeSnippet.Title,
+                Description = codeSnippet.Description,
+                Code = codeSnippet.Code,
+                CreatedDate = codeSnippet.CreatedDate,
+                LastModifiedDate = codeSnippet.LastModifiedDate,
+                CodeLanguage = codeSnippet.CodeLanguage,
+                LikedBy = codeSnippet.LikedBy.Select(lb => new ShortUserDataViewModel
+                {
+                    Tag = lb.Tag,
+                    Username = lb.Username
+                }).ToList()
+            };
+            return Ok(displaySnippet);
+        }
+
+        [HttpPut("{usertag}/{snippetName}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserCodeSnippetBySlug(string usertag, string snippetName, [FromBody] EditCodeSnippetModel editData)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            else if (userTag != user.Tag)
+            {
+                return Unauthorized();
+            }
+            var codeSnippet = user.CodeSnippets.FirstOrDefault(cs => cs.Title == snippetName);
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+            if (!string.IsNullOrWhiteSpace(editData.description))
+            {
+                codeSnippet.Description = editData.description;
+            }
+            if (!string.IsNullOrWhiteSpace(editData.code))
+            {
+                codeSnippet.Code = editData.code;
+            }
+            codeSnippet.LastModifiedDate = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return Ok($"Code snippet {snippetName} for user {usertag} updated successfully.");
+        }
+
+        [HttpDelete("{usertag}/{snippetName}")]
+        [Authorize]
+        public async Task<IActionResult> RemoveUserCodeSnippetBySlug(string usertag, string snippetName)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            else if (userTag != user.Tag)
+            {
+                return Unauthorized();
+            }
+            var codeSnippet = user.CodeSnippets.FirstOrDefault(cs => cs.Title == snippetName);
+
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+
+            _context.CodeSnippets.Remove(codeSnippet);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Code snippet {snippetName} for user {usertag} deleted successfully.");
+        }
+
+        [HttpPost("{usertag}/{snippetName}/like")]
+        [Authorize]
+        public async Task<IActionResult> LikeCodeSnippet(string usertag, string snippetName)
+        {
+            var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _context.Users
+                .Include(u => u.LikedSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == userTag);
+
+            if (user == null)
+            {
+                return NotFound($"User with tag {userTag} not found.");
+            }
+
+            var codeSnippet = await _context.CodeSnippets
+                .Include(cs => cs.LikedBy)
+                .FirstOrDefaultAsync(cs => cs.AuthorTag == usertag && cs.Title == snippetName);
+
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+
+            if (user.LikedSnippets.Contains(codeSnippet))
+            {
+                user.LikedSnippets.Remove(codeSnippet);
+                codeSnippet.LikedBy.Remove(user);
+                await _context.SaveChangesAsync();
+                return Ok($"Code snippet {snippetName} for user {usertag} has been removed from liked snippets.");
+            }
+            else
+            {
+                user.LikedSnippets.Add(codeSnippet);
+                codeSnippet.LikedBy.Add(user);
+                await _context.SaveChangesAsync();
+                return Ok($"Code snippet {snippetName} for user {usertag} liked successfully.");
+            }
+        }
+
+        [HttpPost("{usertag}/{snippetName}/mix")]
+        [Authorize]
+        public async Task<IActionResult> MixCodeSnippet(string usertag, string snippetName, [FromBody] MixCodeSnippetModel mixData)
+        {
+            try
+            {
+                var userTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _context.Users
+                    .Include(u => u.CodeSnippets)
+                    .FirstOrDefaultAsync(u => u.Tag == userTag);
+
+                if (user is null)
+                {
+                    return NotFound($"User with tag {userTag} not found.");
+                }
+
+                var codeSnippet = await _context.CodeSnippets
+                    .FirstOrDefaultAsync(cs => cs.AuthorTag == usertag && cs.Title == snippetName);
+
+                if (codeSnippet is null)
+                {
+                    return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+                }
+
+                string newTitle = "";
+
+                if (mixData.title is null)
+                {
+                    var existingSnippets = user.CodeSnippets
+                        .Where(cs => cs.Title.StartsWith($"{snippetName}-mix-"))
+                        .Select(cs => cs.Title)
+                        .ToList();
+
+                    var maxCounter = existingSnippets
+                        .Select(title => int.TryParse(title.Substring($"{snippetName}-mix-".Length), out int counter) ? counter : 0)
+                        .DefaultIfEmpty(0)
+                        .Max();
+
+                    newTitle = $"{snippetName}-mix-{maxCounter + 1}";
+                }
+                else
+                {
+                    newTitle = mixData.title;
+                }
+
+                var newCodeSnippet = new CodeSnippet
+                {
+                    AuthorTag = userTag,
+                    Author = user,
+                    Title = newTitle,
+                    Description = string.IsNullOrWhiteSpace(mixData.description) ? codeSnippet.Description : mixData.description,
+                    Code = codeSnippet.Code,
+                    CreatedDate = DateTime.UtcNow,
+                    CodeLanguage = codeSnippet.CodeLanguage,
+                    MixedFrom = codeSnippet
+                };
+
+                user.CodeSnippets.Add(newCodeSnippet);
+                codeSnippet.Mixes.Add(newCodeSnippet);
+                await _context.SaveChangesAsync();
+
+                return Ok($"Code snippet {snippetName} forked successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
 
@@ -139,4 +290,16 @@ public class AddCodeSnippetBody
     public string? title { get; set; }
     public string? description { get; set; }
     public string? code { get; set; }
+}
+
+public class EditCodeSnippetModel
+{
+    public string? description { get; set; }
+    public string? code { get; set; }
+}
+
+public class MixCodeSnippetModel
+{
+    public string? title { get; set; }
+    public string? description { get; set; }
 }
