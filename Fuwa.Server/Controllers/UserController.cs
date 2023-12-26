@@ -1,6 +1,7 @@
 ﻿using Fuwa.Data;
 using Fuwa.Models;
 using Fuwa.Server.Models;
+using Fuwa.Server.ViewModels;
 using Fuwa.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -92,6 +93,7 @@ namespace Fuwa.Server.Controllers
         {
             var user = await _context.Users
                 .Include(u => u.CodeSnippets)
+                .ThenInclude(cs => cs.MixedFrom)
                 .FirstOrDefaultAsync(u => u.Tag  == usertag);
             if (user == null)
             {
@@ -113,6 +115,13 @@ namespace Fuwa.Server.Controllers
                     Title = cs.Title,
                     Description = cs.Description,
                     Code = cs.Code,
+                    MixedFrom = cs.MixedFrom != null
+                ? new MixedFromViewModel
+                {
+                    Title = cs.MixedFrom.Title,
+                    AuthorTag = cs.MixedFrom.Author?.Tag
+                }
+                : null,
                     CreatedDate = cs.CreatedDate,
                     LastModifiedDate = cs.LastModifiedDate,
                     CodeLanguage = cs.CodeLanguage
