@@ -56,12 +56,7 @@ namespace Fuwa.Server.Controllers
                     Code = cs.Code,
                     CreatedDate = cs.CreatedDate,
                     LastModifiedDate = cs.LastModifiedDate,
-                    CodeLanguage = cs.CodeLanguage,
-                    LikedBy = cs.LikedBy.Select(lb => new ShortUserDataViewModel
-                    {
-                        Tag = lb.Tag,
-                        Username = lb.Username
-                    }).ToList()
+                    CodeLanguage = cs.CodeLanguage
                 }).ToList(),
                 Posts = user.Posts.Select(post => new PostViewModel
                 {
@@ -108,25 +103,20 @@ namespace Fuwa.Server.Controllers
                 .Skip(pageIndex)
                 .Take(pageSize)
                 .Select(cs => new CodeSnippetViewModel
-            {
-                Id = cs.Id,
-                PostedBy = new ShortUserDataViewModel
                 {
-                    Tag = user.Tag,
-                    Username = user.Username
-                },
-                Title = cs.Title,
-                Description = cs.Description,
-                Code = cs.Code,
-                CreatedDate = cs.CreatedDate,
-                LastModifiedDate = cs.LastModifiedDate,
-                CodeLanguage = cs.CodeLanguage,
-                LikedBy = cs.LikedBy.Select(lb => new ShortUserDataViewModel
-                {
-                    Tag = lb.Tag,
-                    Username = lb.Username
-                }).ToList(),
-            }).ToList();
+                    Id = cs.Id,
+                    PostedBy = new ShortUserDataViewModel
+                    {
+                        Tag = user.Tag,
+                        Username = user.Username
+                    },
+                    Title = cs.Title,
+                    Description = cs.Description,
+                    Code = cs.Code,
+                    CreatedDate = cs.CreatedDate,
+                    LastModifiedDate = cs.LastModifiedDate,
+                    CodeLanguage = cs.CodeLanguage
+                });
             return Ok(displaySnippets);
         }
 

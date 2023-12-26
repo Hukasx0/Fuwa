@@ -75,10 +75,11 @@ namespace Fuwa.Server.Controllers
         }
 
         [HttpGet("{usertag}/{snippetName}")]
-        public async Task<IActionResult> GetUserCodeSnippetBySlug(string usertag, string snippetName)
+        public async Task<IActionResult> GetUserCodeSnippetByName(string usertag, string snippetName)
         {
             var user = await _context.Users
                 .Include(u => u.CodeSnippets)
+                .ThenInclude(cs => cs.MixedFrom)
                 .FirstOrDefaultAsync(u => u.Tag == usertag);
             if (user == null)
             {
@@ -103,18 +104,21 @@ namespace Fuwa.Server.Controllers
                 CreatedDate = codeSnippet.CreatedDate,
                 LastModifiedDate = codeSnippet.LastModifiedDate,
                 CodeLanguage = codeSnippet.CodeLanguage,
-                LikedBy = codeSnippet.LikedBy.Select(lb => new ShortUserDataViewModel
-                {
-                    Tag = lb.Tag,
-                    Username = lb.Username
-                }).ToList()
             };
+            if (codeSnippet.MixedFrom != null)
+            {
+                displaySnippet.MixedFrom = new MixedFromViewModel
+                {
+                    Title = codeSnippet.MixedFrom.Title,
+                    AuthorTag = codeSnippet.MixedFrom.Author.Tag
+                };
+            }
             return Ok(displaySnippet);
         }
 
         [HttpPut("{usertag}/{snippetName}")]
         [Authorize]
-        public async Task<IActionResult> UpdateUserCodeSnippetBySlug(string usertag, string snippetName, [FromBody] EditCodeSnippetModel editData)
+        public async Task<IActionResult> UpdateUserCodeSnippetByName(string usertag, string snippetName, [FromBody] EditCodeSnippetModel editData)
         {
             var user = await _context.Users
                 .Include(u => u.CodeSnippets)
@@ -148,7 +152,7 @@ namespace Fuwa.Server.Controllers
 
         [HttpDelete("{usertag}/{snippetName}")]
         [Authorize]
-        public async Task<IActionResult> RemoveUserCodeSnippetBySlug(string usertag, string snippetName)
+        public async Task<IActionResult> RemoveUserCodeSnippetByName(string usertag, string snippetName)
         {
             var user = await _context.Users
                 .Include(u => u.CodeSnippets)
@@ -173,6 +177,71 @@ namespace Fuwa.Server.Controllers
             await _context.SaveChangesAsync();
 
             return Ok($"Code snippet {snippetName} for user {usertag} deleted successfully.");
+        }
+
+        [HttpGet("{usertag}/{snippetName}/likes")]
+        public async Task<IActionResult>  GetCodeSnippetLikes(string usertag, string snippetName, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .ThenInclude(cs => cs.LikedBy)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            var codeSnippet = user.CodeSnippets
+                .FirstOrDefault(cs => cs.Title == snippetName);
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+            pageSize = Math.Min(pageSize, 10);
+            var codeSnippetLikes = codeSnippet.LikedBy
+                .OrderBy(csu => csu.Tag)
+                .Skip(pageIndex)
+                .Take(pageSize)
+                .Select(userData => new ShortUserDataViewModel
+                {
+                    Tag = userData.Tag,
+                    Username = userData.Tag
+                });
+            return Ok(codeSnippetLikes);
+        }
+
+        [HttpGet("{usertag}/{snippetName}/mixes")]
+        public async Task<IActionResult> GetCodeSnippetMixes(string usertag, string snippetName, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
+        {
+            var user = await _context.Users
+                .Include(u => u.CodeSnippets)
+                .ThenInclude(cs => cs.Mixes)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            var codeSnippet = user.CodeSnippets
+                .FirstOrDefault(cs => cs.Title == snippetName);
+            if (codeSnippet == null)
+            {
+                return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
+            }
+            pageSize = Math.Min(pageSize, 10);
+            var codeSnippetMixes = codeSnippet.Mixes
+                .OrderByDescending(csm => csm.Id)
+                .Skip(pageIndex)
+                .Take(pageSize)
+                .Select(mixData => new MixViewModel
+                {
+                    Title = mixData.Title,
+                    Author = new ShortUserDataViewModel
+                    {
+                        Tag = mixData.AuthorTag,
+                        Username = mixData.Author.Username
+                    },
+                    CreatedDate = mixData.CreatedDate
+                });
+            return Ok(codeSnippetMixes);
         }
 
         [HttpPost("{usertag}/{snippetName}/like")]
