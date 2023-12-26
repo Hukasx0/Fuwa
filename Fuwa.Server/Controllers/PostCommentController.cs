@@ -11,11 +11,14 @@ namespace Fuwa.Server.Controllers
     public partial class PostController : ControllerBase
     {
         [HttpGet("{id}/comments")]
-        public async Task<IActionResult> GetPostComments([FromRoute] int id)
+        public async Task<IActionResult> GetPostComments([FromRoute] int id, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
+            pageSize = Math.Min(pageSize, 10);
             var post = await _context.Posts
                 .Include(p => p.PostComments)
                 .ThenInclude(pc => pc.Author)
+                .Skip(pageIndex)
+                .Take(pageSize)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (post == null)

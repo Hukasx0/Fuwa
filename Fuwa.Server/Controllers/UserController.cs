@@ -22,13 +22,13 @@ namespace Fuwa.Server.Controllers
         }
 
         [HttpGet("{usertag}", Name = "GetUserByTag")]
-        public async Task<IActionResult> GetUserByTag([FromRoute] string tag)
+        public async Task<IActionResult> GetUserByTag([FromRoute] string usertag)
         {
             var user = await _context.Users
                 .Include(u => u.CodeSnippets)
                 .Include(u => u.Posts)
                 .Include(u => u.PostComments)
-                .FirstOrDefaultAsync(u => u.Tag == tag);
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
             if (user == null)
             {
                 return NotFound();
@@ -93,7 +93,7 @@ namespace Fuwa.Server.Controllers
         }
 
         [HttpGet("{usertag}/codeSnippets")]
-        public async Task<IActionResult> GetUserCodeSnippets(string usertag)
+        public async Task<IActionResult> GetUserCodeSnippets(string usertag, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
             var user = await _context.Users
                 .Include(u => u.CodeSnippets)
@@ -102,7 +102,12 @@ namespace Fuwa.Server.Controllers
             {
                 return NotFound($"User with tag {usertag} not found.");
             }
-            var displaySnippets = user.CodeSnippets.Select(cs => new CodeSnippetViewModel
+            pageSize = Math.Min(pageSize, 10);
+            var displaySnippets = user.CodeSnippets
+                .OrderByDescending(cs => cs.Id)
+                .Skip(pageIndex)
+                .Take(pageSize)
+                .Select(cs => new CodeSnippetViewModel
             {
                 Id = cs.Id,
                 PostedBy = new ShortUserDataViewModel
@@ -126,7 +131,7 @@ namespace Fuwa.Server.Controllers
         }
 
         [HttpGet("{usertag}/posts")]
-        public async Task<IActionResult> GetUserPosts(string usertag)
+        public async Task<IActionResult> GetUserPosts(string usertag, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
             var user = await _context.Users
                 .Include(u => u.Posts)
@@ -135,7 +140,12 @@ namespace Fuwa.Server.Controllers
             {
                 return NotFound($"User with tag {usertag} not found.");
             }
-            var displayPosts = user.Posts.Select(p => new PostViewModel
+            pageSize = Math.Min(pageSize, 10);
+            var displayPosts = user.Posts
+                .OrderByDescending(p => p.Id)
+                .Skip(pageIndex)
+                .Take(pageSize)
+                .Select(p => new PostViewModel
             {
                 Id = p.Id,
                 PostedBy = new ShortUserDataViewModel
@@ -152,7 +162,7 @@ namespace Fuwa.Server.Controllers
         }
 
         [HttpGet("{usertag}/comments")]
-        public async Task<IActionResult> GetUserComments(string usertag)
+        public async Task<IActionResult> GetUserComments(string usertag, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
             var user = await _context.Users
                 .Include(u => u.PostComments)
@@ -161,7 +171,12 @@ namespace Fuwa.Server.Controllers
             {
                 return NotFound($"User with tag {usertag} not found.");
             }
-            var displayComments = user.PostComments.Select(pc => new PostCommentViewModel
+            pageSize = Math.Min(pageSize, 10);
+            var displayComments = user.PostComments
+                .OrderByDescending(pc => pc.Id)
+                .Skip(pageIndex)
+                .Take(pageSize)
+                .Select(pc => new PostCommentViewModel
             {
                 Id = pc.Id,
                 PostedBy = new ShortUserDataViewModel
@@ -178,14 +193,14 @@ namespace Fuwa.Server.Controllers
 
         [HttpPut("{usertag}")]
         [Authorize]
-        public async Task<IActionResult> UpdateUserData(string tag, [FromBody] UpdateUserModel newUserData)
+        public async Task<IActionResult> UpdateUserData(string usertag, [FromBody] UpdateUserModel newUserData)
         {
             var jwtUserTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (jwtUserTag != tag)
+            if (jwtUserTag != usertag)
             {
                 return Forbid();
             }
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == tag);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == usertag);
             if (user == null)
             {
                 return NotFound();
@@ -220,14 +235,14 @@ namespace Fuwa.Server.Controllers
 
         [HttpPut("{usertag}/password")]
         [Authorize]
-        public async Task<IActionResult> UpdateUserPassword(string tag, [FromBody] ChangePasswordModel passwords)
+        public async Task<IActionResult> UpdateUserPassword(string usertag, [FromBody] ChangePasswordModel passwords)
         {
             var jwtUserTag = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (jwtUserTag != tag)
+            if (jwtUserTag != usertag)
             {
                 return Forbid();
             }
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == tag);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Tag == usertag);
             if (user == null) 
             {
                 return NotFound();

@@ -11,7 +11,7 @@ namespace Fuwa.Server.Controllers
     public partial class CodeSnippetController : ControllerBase
     {
         [HttpGet("{usertag}/{snippetName}/comments")]
-        public async Task<IActionResult> GetCodeSnippetComments(string usertag, string snippetName)
+        public async Task<IActionResult> GetCodeSnippetComments(string usertag, string snippetName, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
             try
             {
@@ -32,7 +32,12 @@ namespace Fuwa.Server.Controllers
                     return NotFound($"Code snippet with title {snippetName} not found for user {usertag}.");
                 }
 
-                var comments = codeSnippet.Comments.Select(comment => new PostCommentViewModel
+                pageSize = Math.Min(pageSize, 10);
+                var comments = codeSnippet.Comments
+                    .OrderBy(cs => cs.Id)
+                    .Skip(pageIndex)
+                    .Take(pageSize)
+                    .Select(comment => new PostCommentViewModel
                 {
                     Id = comment.Id,
                     PostedBy = new ShortUserDataViewModel
