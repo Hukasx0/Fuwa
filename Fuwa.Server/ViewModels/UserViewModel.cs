@@ -17,8 +17,5 @@ namespace Fuwa.ViewModels
         public string? Company { get; set; }
         public string? Location { get; set; }
         public string? PersonalWebsite { get; set; }
-        public ICollection<CodeSnippetViewModel> CodeSnippets { get; set; } = null!;
-        public ICollection<PostViewModel> Posts { get; set; } = null!;
-        public ICollection<PostCommentViewModel> PostComments { get; set; } = null!;
     }
 }
