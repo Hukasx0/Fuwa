@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostComponent } from './post/post.component';
 import { RouterLink } from '@angular/router';
+import { TimeAgoPipe } from '../time-ago.pipe';
 
 
 @NgModule({
@@ -10,7 +11,8 @@ import { RouterLink } from '@angular/router';
   ],
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    TimeAgoPipe
   ]
 })
 export class PostModule { }

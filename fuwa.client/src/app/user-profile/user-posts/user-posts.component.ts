@@ -2,11 +2,12 @@ import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Post } from 'src/app/models/post';
 import { UsersService } from 'src/app/services/users.service';
+import { TimeAgoPipe } from 'src/app/time-ago.pipe';
 
 @Component({
   selector: 'app-user-posts',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TimeAgoPipe],
   templateUrl: './user-posts.component.html',
   styleUrl: './user-posts.component.css'
 })

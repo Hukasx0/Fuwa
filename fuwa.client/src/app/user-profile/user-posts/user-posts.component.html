@@ -1,6 +1,7 @@
 @for (post of posts; track post.id) {
     <div>
         <h3 routerLink="../post/{{ post.id }}">{{ post.title }}</h3>
+        <p>posted {{ post.createdDate | timeAgo }}</p>
     </div>
 } @empty {
     <div>User has no posts</div>

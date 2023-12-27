@@ -9,6 +9,11 @@
             </p>
         }
         <p>{{ snippet.description }}</p>
+        @if (snippet.lastModifiedDate) {
+            <p>modified {{ snippet.lastModifiedDate | timeAgo }}</p>
+        } @else {
+            <p>created {{ snippet.createdDate | timeAgo }}</p>
+        }
     </div>
 } @empty {
     <div>User has no code snippets</div>
