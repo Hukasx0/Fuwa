@@ -3,7 +3,7 @@
         <h1 routerLink="/post/{{ post.id }}" style="color: red; cursor: pointer">{{ post.title }}</h1>
         <h2>posted by <b style="cursor: pointer;" routerLink="/{{ post.postedBy.tag }}">{{ post.postedBy.username }}</b></h2>
         <span>{{ post.text }}</span> <br />
-        <span>{{ post.createdDate }}</span>
+        <span>{{ post.createdDate | timeAgo }}</span>
     </div>
 } @empty {
     <div>Empty</div>
