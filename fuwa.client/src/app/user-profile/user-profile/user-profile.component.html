@@ -4,6 +4,39 @@
     @if (user.bio) {
         <p>{{ user.bio }}</p>
     }
+    @switch (tab) {
+        @case ("snippets") {
+            @defer {
+                <app-user-code-snippets [userTag]=user.tag />
+            } @loading (after 100ms; minimum 1s) {
+                <div>loading...</div>
+            }
+        }
+        @case ("posts") {
+            @defer {
+                <app-user-posts [userTag]=user.tag />
+            } @loading (after 100ms; minimum 1s) {
+                <div>loading...</div>
+            }
+        }
+        @case ("comments") {
+            @defer {
+                <app-user-comments [userTag]=user.tag />
+            } @loading (after 100ms; minimum 1s) {
+                <div>loading...</div>
+            }
+        }
+        @case ("likes") {
+            @defer {
+                <app-user-likes [userTag]=user.tag />
+            } @loading (after 100ms; minimum 1s) {
+                <div>loading...</div>
+            }
+        }
+        @default {
+            <div>default page</div>
+        }
+    }
 } @else {
     <div>Not found</div>
 }

@@ -1,11 +1,10 @@
 import { PostedBy } from "./postedBy"
 
-export class CodeSnippet {
+export class CodeSnippetShort {
     id: number = 0
     postedBy: PostedBy = new PostedBy
     title: string = ""
     description: string = ""
-    code: string = ""
     mixedFrom: Mix = new Mix
     createdDate: Date = new Date
     lastModifiedDate: Date = new Date
@@ -14,6 +13,5 @@ export class CodeSnippet {
 
 class Mix {
     title: string = ""
-    author: PostedBy = new PostedBy
-    createdDate: Date = new Date
+    authorTag: string = ""
 }

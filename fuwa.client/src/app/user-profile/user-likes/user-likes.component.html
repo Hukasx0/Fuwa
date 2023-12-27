@@ -1,0 +1,15 @@
+@for (snippet of likes; track snippet.id) {
+    <div>
+        <h3 style="cursor: pointer;" routerLink="{{ snippet.title }}">{{ snippet.title }}</h3>
+        @if (snippet.mixedFrom) {
+            <p>mixed from 
+                <a style="cursor: pointer;" routerLink="../{{ snippet.mixedFrom.authorTag }}/{{ snippet.mixedFrom.title }}">
+                    {{ snippet.mixedFrom.authorTag }}/{{ snippet.mixedFrom.title }}
+                </a>
+            </p>
+        }
+        <p>{{ snippet.description }}</p>
+    </div>
+} @empty {
+    <div>User has no code snippets</div>
+}

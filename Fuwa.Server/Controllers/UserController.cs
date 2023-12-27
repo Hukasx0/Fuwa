@@ -64,17 +64,12 @@ namespace Fuwa.Server.Controllers
                 .OrderByDescending(cs => cs.Id)
                 .Skip(pageIndex)
                 .Take(pageSize)
-                .Select(cs => new CodeSnippetViewModel
+                .Select(cs => new ShortCodeSnippetViewModel
                 {
                     Id = cs.Id,
-                    PostedBy = new ShortUserDataViewModel
-                    {
-                        Tag = user.Tag,
-                        Username = user.Username
-                    },
+                    AuthorTag = cs.AuthorTag,
                     Title = cs.Title,
                     Description = cs.Description,
-                    Code = cs.Code,
                     MixedFrom = cs.MixedFrom != null
                 ? new MixedFromViewModel
                 {
@@ -148,6 +143,41 @@ namespace Fuwa.Server.Controllers
                 LastModifiedDate = pc.LastModifiedDate
             }).ToList();
             return Ok(displayComments);
+        }
+
+        [HttpGet("{usertag}/likes")]
+        public async Task<IActionResult> GetUserLikes(string usertag, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
+        {
+            var user = await _context.Users
+                .Include(u => u.LikedSnippets)
+                .FirstOrDefaultAsync(u => u.Tag == usertag);
+            if (user == null)
+            {
+                return NotFound($"User with tag {usertag} not found.");
+            }
+            pageSize = Math.Min(pageSize, 10);
+            var displayLikedSnippets = user.LikedSnippets
+                .OrderByDescending(cs => cs.Id)
+                .Skip(pageIndex)
+                .Take(pageSize)
+                .Select(cs => new ShortCodeSnippetViewModel
+                {
+                    Id = cs.Id,
+                    AuthorTag = cs.AuthorTag,
+                    Title = cs.Title,
+                    Description = cs.Description,
+                    MixedFrom = cs.MixedFrom != null
+                ? new MixedFromViewModel
+                {
+                    Title = cs.MixedFrom.Title,
+                    AuthorTag = cs.MixedFrom.Author?.Tag
+                }
+                : null,
+                    CreatedDate = cs.CreatedDate,
+                    LastModifiedDate = cs.LastModifiedDate,
+                    CodeLanguage = cs.CodeLanguage
+                });
+            return Ok(displayLikedSnippets);
         }
 
         [HttpPut("{usertag}")]

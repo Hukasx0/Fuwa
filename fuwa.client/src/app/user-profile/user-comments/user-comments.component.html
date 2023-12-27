@@ -1,0 +1,7 @@
+@for (comment of comments; track comment.id) {
+    <div>
+        <p>{{ comment.text }}</p>
+    </div>
+} @empty {
+    <div>User has no comments</div>
+}

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { combineLatest } from 'rxjs';
 import { User } from 'src/app/models/user';
 import { UsersService } from 'src/app/services/users.service';
 
@@ -10,16 +11,20 @@ import { UsersService } from 'src/app/services/users.service';
 })
 export class UserProfileComponent {
   user: User | undefined;
+  tab: string | undefined;
 
   constructor(private usersService: UsersService,
               private route: ActivatedRoute
               ) { }
 
     ngOnInit(): void {
-      this.route.params.subscribe(params => {
-        const userTag = params['user'];
-        this.getUser(userTag);
-      })
+      combineLatest([this.route.params, this.route.queryParams])
+        .subscribe(([params, queryParams]) => {
+          const userTag = params['user'];
+          const tabValue = queryParams['tab'];
+          this.tab = tabValue;
+          this.getUser(userTag);
+      });
     }
 
     private getUser(tag: string): void {
