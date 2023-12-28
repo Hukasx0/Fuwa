@@ -7,7 +7,7 @@ export class CodeSnippetShort {
     description: string = ""
     mixedFrom: Mix = new Mix
     createdDate: Date = new Date
-    lastModifiedDate: Date = new Date
+    lastModifiedDate: Date | undefined
     codeLanguage: number = 0
 }
 

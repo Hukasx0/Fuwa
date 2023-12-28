@@ -27,7 +27,6 @@ namespace Fuwa.Server.Models
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        [Required]
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime? LastModifiedDate { get; set; }
     }
 }

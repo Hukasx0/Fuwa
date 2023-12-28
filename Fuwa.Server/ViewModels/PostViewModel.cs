@@ -11,6 +11,6 @@ namespace Fuwa.ViewModels
         public string? Title { get; set; }
         public string? Text { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime? LastModifiedDate { get; set; }
     }
 }

@@ -31,8 +31,7 @@ namespace Fuwa.Models
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        [Required]
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime? LastModifiedDate { get; set; }
 
         [Required]
         public CodeLanguage CodeLanguage { get; set; }

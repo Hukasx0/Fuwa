@@ -16,7 +16,7 @@ namespace Fuwa.ViewModels
         public string? Code { get; set; }
         public MixedFromViewModel? MixedFrom { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime? LastModifiedDate { get; set; }
         public CodeLanguage CodeLanguage { get; set; }
     }
 }

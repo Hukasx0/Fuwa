@@ -59,7 +59,6 @@ namespace Fuwa.Server.Controllers
                     Description = snippetData.description,
                     Code = snippetData.code,
                     CreatedDate = DateTime.UtcNow,
-                    // LastModifiedDate = DateTime.Now,
                     CodeLanguage = CodeLanguage.C,
                     LikedBy = new List<User>()
                 };
