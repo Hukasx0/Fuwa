@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { HeaderComponent } from './header/header.component';
-import { MatButtonModule } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { MenubarModule } from 'primeng/menubar';
 
 @NgModule({
   declarations: [
@@ -11,9 +9,7 @@ import { RouterLink } from '@angular/router';
   ],
   imports: [
     CommonModule,
-    MatToolbarModule,
-    MatButtonModule,
-    RouterLink
+    MenubarModule
   ],
   exports: [HeaderComponent]
 })

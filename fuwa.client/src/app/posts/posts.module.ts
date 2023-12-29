@@ -4,6 +4,8 @@ import { PostsComponent } from './posts/posts.component';
 import { RouterLink } from '@angular/router';
 import { TimeAgoPipe } from '../time-ago.pipe';
 
+import { CardModule } from 'primeng/card';
+
 
 
 @NgModule({
@@ -13,7 +15,8 @@ import { TimeAgoPipe } from '../time-ago.pipe';
   imports: [
     CommonModule,
     RouterLink,
-    TimeAgoPipe
+    TimeAgoPipe,
+    CardModule
   ]
 })
 export class PostsModule { }

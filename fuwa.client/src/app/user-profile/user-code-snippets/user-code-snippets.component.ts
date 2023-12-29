@@ -21,7 +21,6 @@ export class UserCodeSnippetsComponent {
     this.usersService.getUserCodeSnippets(this.userTag).subscribe({
       next: (response) => {
         this.codeSnippets = response;
-        console.log(response);
       },
       error: (error) => {
         console.error("Error while fetching comments: ", error);

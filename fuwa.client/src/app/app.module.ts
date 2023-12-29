@@ -21,7 +21,7 @@ import { AuthInterceptor } from './services/interceptor';
     RouterLink,
     HeaderModule,
     FooterModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [
     {

@@ -1,14 +1,13 @@
 <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <mat-form-field appearance="fill">
-      <mat-label>Login or Email</mat-label>
-        <input matInput formControlName="userTagOrMail" />
-      </mat-form-field>
-  
-      <mat-form-field appearance="fill">
-        <mat-label>Password</mat-label>
-        <input matInput type="password" formControlName="password" />
-      </mat-form-field>
-  
-    <button mat-raised-button color="primary" type="submit" [disabled]="isFormInvalid()">Login</button>
+  <div class="p-field">
+    <label for="userTagOrMail">Login or Email</label>
+    <input id="userTagOrMail" pInputText formControlName="userTagOrMail" />
+  </div>
+
+  <div class="p-field">
+    <label for="password">Password</label>
+    <input id="password" pPassword type="password" formControlName="password"  />
+  </div>
+
+  <button pButton type="submit" label="Login" class="p-button-raised p-button-primary" [disabled]="isFormInvalid()"></button>
 </form>
-  

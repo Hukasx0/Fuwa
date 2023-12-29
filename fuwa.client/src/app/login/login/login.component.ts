@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Login } from 'src/app/models/login';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -21,8 +20,7 @@ export class LoginComponent {
 
  constructor(private formbuilder: FormBuilder,
              private authService: AuthenticationService,
-             private router: Router,
-             private snackBar: MatSnackBar
+             private router: Router
              ) {
   this.loginForm = this.formbuilder.group({
     userTagOrMail: ['', Validators.required],
@@ -50,13 +48,13 @@ onSubmit() {
     },
     error: (error) => {
       console.error('Login error:', error);
-      this.showSnackbarError(error.error || 'Login error occurred');
+     // this.showSnackbarError(error.error || 'Login error occurred');
     }
   });
  }
- private showSnackbarError(message: string): void {
+ /*private showSnackbarError(message: string): void {
   this.snackBar.open(message, 'Close', {
     duration: 5000
    });
- }
+ }*/
 }

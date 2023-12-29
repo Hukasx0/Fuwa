@@ -1,29 +1,28 @@
 <form class="register-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <mat-form-field appearance="fill">
-      <mat-label>User Tag</mat-label>
-      <input matInput formControlName="userTag" />
-    </mat-form-field>
-  
-    <mat-form-field appearance="fill">
-      <mat-label>Email</mat-label>
-      <input matInput formControlName="email" />
-    </mat-form-field>
-  
-    <mat-form-field appearance="fill">
-      <mat-label>Username</mat-label>
-      <input matInput formControlName="username" />
-    </mat-form-field>
-  
-    <mat-form-field appearance="fill">
-      <mat-label>Password</mat-label>
-      <input matInput type="password" formControlName="password" />
-    </mat-form-field>
+  <div class="p-field">
+    <label for="userTag">User Tag</label>
+    <input id="userTag" pInputText formControlName="userTag" />
+  </div>
 
-    <mat-checkbox formControlName="acceptTerms">
-        I accept the terms and conditions
-    </mat-checkbox>
-  
-    <button mat-raised-button color="primary" type="submit" [disabled]="isFormInvalid()">
-        Register
-    </button>
+  <div class="p-field">
+    <label for="email">Email</label>
+    <input id="email" pInputText formControlName="email" />
+  </div>
+
+  <div class="p-field">
+    <label for="username">Username</label>
+    <input id="username" pInputText formControlName="username" />
+  </div>
+
+  <div class="p-field">
+    <label for="password">Password</label>
+    <input id="password" pPassword type="password" formControlName="password"  />
+  </div>
+
+  <div class="p-field-checkbox">
+    <p-checkbox inputId="acceptTerms" [binary]="true" formControlName="acceptTerms"></p-checkbox>
+    <label for="acceptTerms">I accept the terms and conditions</label>
+  </div>
+
+  <button pButton type="submit" label="Register" class="p-button-raised p-button-primary" [disabled]="isFormInvalid()"></button>
 </form>

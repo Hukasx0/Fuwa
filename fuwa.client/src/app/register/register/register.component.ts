@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Register } from 'src/app/models/register';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-register',
@@ -22,7 +21,6 @@ export class RegisterComponent {
   constructor(private formbuilder: FormBuilder,
               private authService: AuthenticationService,
               private router: Router,
-              private snackBar: MatSnackBar
               ) {
     this.registerForm = this.formbuilder.group({
       userTag: ['', Validators.required],
@@ -56,13 +54,13 @@ export class RegisterComponent {
       },
       error: (error) => {
         console.error('Register error: ', error);
-        this.showSnackbarError(error.error || 'Register error occurred');
+     //   this.showSnackbarError(error.error || 'Register error occurred');
       }
     })
   }
-  private showSnackbarError(message: string): void {
+ /* private showSnackbarError(message: string): void {
     this.snackBar.open(message, 'Close', {
       duration: 5000
      });
-  }
+  }*/
 }

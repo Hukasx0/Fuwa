@@ -4,11 +4,10 @@ import { RegisterComponent } from './register/register.component';
 
 import { ReactiveFormsModule } from '@angular/forms';
 
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
 
 @NgModule({
   declarations: [
@@ -17,11 +16,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCheckboxModule
+    InputTextModule,
+    PasswordModule,
+    CheckboxModule,
+    ButtonModule
   ]
 })
 export class RegisterModule { }
