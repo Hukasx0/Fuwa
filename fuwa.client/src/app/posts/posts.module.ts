@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { TimeAgoPipe } from '../time-ago.pipe';
 
 import { CardModule } from 'primeng/card';
+import { PanelModule } from 'primeng/panel';
+import { AvatarModule } from 'primeng/avatar';
 
 
 
@@ -16,7 +18,9 @@ import { CardModule } from 'primeng/card';
     CommonModule,
     RouterLink,
     TimeAgoPipe,
-    CardModule
+    CardModule,
+    AvatarModule,
+    PanelModule
   ]
 })
 export class PostsModule { }

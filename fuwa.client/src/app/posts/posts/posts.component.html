@@ -1,9 +1,24 @@
 @for (post of posts; track post.id) {
-    <p-card header="{{ post.title }}" routerLink="/post/{{ post.id }}">
-        <h2>posted by <b style="cursor: pointer;" routerLink="/{{ post.postedBy.tag }}">{{ post.postedBy.username }}</b></h2>
-        <span>{{ post.text }}</span> <br />
-        <span>{{ post.createdDate | timeAgo }}</span>
-    </p-card>
+    <p-panel>
+        <ng-template pTemplate="header">
+            <div class="flex align-items-center gap-2">
+                <p-avatar routerLink="/{{ post.postedBy.tag }}" image="https://raw.githubusercontent.com/Hukasx0/Fuwa/main/logo.jpeg" size="large" shape="circle" />
+                <span class="font-bold" routerLink="/{{ post.postedBy.tag }}">{{ post.postedBy.username }}</span>
+            </div>
+        </ng-template>
+        <div routerLink="/post/{{ post.id }}">
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.text }}</p>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="flex align-items-center gap-2">
+                </div>
+                <span class="p-text-secondary">{{ post.createdDate | timeAgo }}</span>
+            </div>
+        </ng-template>
+    </p-panel>
+    
 } @empty {
     <div>Empty</div>
 }
