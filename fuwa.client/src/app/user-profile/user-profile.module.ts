@@ -6,6 +6,8 @@ import { UserLikesComponent } from './user-likes/user-likes.component';
 import { UserPostsComponent } from './user-posts/user-posts.component';
 import { UserCodeSnippetsComponent } from './user-code-snippets/user-code-snippets.component';
 import { TabViewModule } from 'primeng/tabview';
+import { TabMenuModule } from 'primeng/tabmenu';
+import { UserMainComponent } from './user-main/user-main.component';
 
 
 
@@ -18,9 +20,11 @@ import { TabViewModule } from 'primeng/tabview';
     UserCommentsComponent,
     UserLikesComponent,
     UserPostsComponent,
+    UserMainComponent,
     UserCodeSnippetsComponent,
     UserLikesComponent,
-    TabViewModule
+    TabViewModule,
+    TabMenuModule
   ]
 })
 export class UserProfileModule { }
