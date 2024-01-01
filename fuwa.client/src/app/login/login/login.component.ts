@@ -13,7 +13,7 @@ export class LoginComponent {
  loginForm: FormGroup;
 
  ngOnInit() {
-  if (localStorage.getItem('auth')) {
+  if (this.authService.isLoggedIn()) {
     this.router.navigate(['/']);
   }
  }
@@ -43,15 +43,14 @@ onSubmit() {
   
   this.authService.login(loginData).subscribe({
     next: (response) => {
-      localStorage.setItem('auth', response.token);
       this.router.navigate(['/']);
     },
     error: (error) => {
-      console.error('Login error:', error);
-     // this.showSnackbarError(error.error || 'Login error occurred');
+      console.error(error);
     }
-  });
- }
+  })
+
+  }
  /*private showSnackbarError(message: string): void {
   this.snackBar.open(message, 'Close', {
     duration: 5000

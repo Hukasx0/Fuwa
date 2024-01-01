@@ -1,15 +1,15 @@
 <div class="container">
   <p-card header="Login">
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="p-fluid">
+      <div class="p-grid p-fluid">
         <div class="p-field p-col-12">
-          <label for="userTagOrMail">Login or Email</label>
+          <label for="userTagOrMail">User Tag or Email</label>
           <input id="userTagOrMail" pInputText formControlName="userTagOrMail" placeholder="Your user tag or email address" />
         </div>
 
         <div class="p-field p-col-12">
           <label for="password">Password</label>
-          <input id="password" pPassword type="password" formControlName="password" placeholder="Password" />
+          <p-password id="password" type="password" formControlName="password" placeholder="Password" />
         </div>
 
         <div class="p-field p-col-12">
