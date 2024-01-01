@@ -13,7 +13,7 @@ export class RegisterComponent {
   registerForm: FormGroup;
 
   ngOnInit() {
-    if (localStorage.getItem('auth')) {
+    if (this.authService.isLoggedIn()) {
       this.router.navigate(['/']);
     }
    }

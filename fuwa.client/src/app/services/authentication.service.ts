@@ -42,7 +42,7 @@ export class AuthenticationService {
   }
 
   public logout(): void {
+    localStorage.removeItem('auth');
     this.isUserLoggedIn = false;
   }
-
 }
