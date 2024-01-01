@@ -1,28 +1,37 @@
-<form class="register-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-  <div class="p-field">
-    <label for="userTag">User Tag</label>
-    <input id="userTag" pInputText formControlName="userTag" />
-  </div>
+<div class="container">
+  <p-card header="Register">
+    <form class="register-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="p-fluid">
+        <div class="p-col-12">
 
-  <div class="p-field">
-    <label for="email">Email</label>
-    <input id="email" pInputText formControlName="email" />
-  </div>
+          <div class="p-field">
+            <label for="userTag">User Tag</label>
+            <input id="userTag" pInputText formControlName="userTag" />
+          </div>
+        </div>
 
-  <div class="p-field">
-    <label for="username">Username</label>
-    <input id="username" pInputText formControlName="username" />
-  </div>
+          <div class="p-field">
+            <label for="email">Email</label>
+            <input id="email" pInputText formControlName="email" />
+          </div>
 
-  <div class="p-field">
-    <label for="password">Password</label>
-    <input id="password" pPassword type="password" formControlName="password"  />
-  </div>
+          <div class="p-field">
+            <label for="username">Username</label>
+            <input id="username" pInputText formControlName="username" />
+          </div>
 
-  <div class="p-field-checkbox">
-    <p-checkbox inputId="acceptTerms" [binary]="true" formControlName="acceptTerms"></p-checkbox>
-    <label for="acceptTerms">I accept the terms and conditions</label>
-  </div>
+          <div class="p-field">
+            <label for="password">Password</label>
+            <input id="password" pPassword type="password" formControlName="password" />
+          </div>
 
-  <button pButton type="submit" label="Register" class="p-button-raised p-button-primary" [disabled]="isFormInvalid()"></button>
-</form>
+          <div class="p-field-checkbox">
+            <p-checkbox inputId="acceptTerms" [binary]="true" formControlName="acceptTerms"></p-checkbox>
+            <label for="acceptTerms">I accept the terms and conditions</label>
+          </div>
+
+          <button pButton type="submit" label="Register" class="p-button-raised p-button-primary" [disabled]="isFormInvalid()"></button>
+      </div>
+    </form>
+  </p-card>
+</div>

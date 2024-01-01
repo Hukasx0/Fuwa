@@ -8,6 +8,7 @@ import { UserCodeSnippetsComponent } from './user-code-snippets/user-code-snippe
 import { TabViewModule } from 'primeng/tabview';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { UserMainComponent } from './user-main/user-main.component';
+import { ImageModule } from 'primeng/image';
 
 
 
@@ -24,7 +25,8 @@ import { UserMainComponent } from './user-main/user-main.component';
     UserCodeSnippetsComponent,
     UserLikesComponent,
     TabViewModule,
-    TabMenuModule
+    TabMenuModule,
+    ImageModule
   ]
 })
 export class UserProfileModule { }

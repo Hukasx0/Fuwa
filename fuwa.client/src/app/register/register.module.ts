@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ButtonModule } from 'primeng/button';
     InputTextModule,
     PasswordModule,
     CheckboxModule,
-    ButtonModule
+    ButtonModule,
+    CardModule
   ]
 })
 export class RegisterModule { }
